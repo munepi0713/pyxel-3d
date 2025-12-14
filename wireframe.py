@@ -5,12 +5,14 @@ import time
 
 from threed import Camera, Mesh
 
-# from z_gouraud_renderer import ZBufferedGouraudRenderer
-# from phong_renderer import PhongRenderer
-# from hidden_line_renderer import HiddenLineRenderer
-from wireframe_renderer import WireframeRenderer
+from z_gouraud_renderer import ZBufferedGouraudRenderer
+from phong_renderer import PhongRenderer
+from hidden_line_renderer import HiddenLineRenderer
+# from wireframe_renderer import WireframeRenderer
+# from gouraud_renderer import GouraudRenderer
 
-FPS = 30
+# FPS = 30
+FPS = 8
 
 
 def generate_sphere_mesh_with_faces(radius=1.0, lat_steps=12, lon_steps=24):
@@ -197,26 +199,33 @@ class Wireframe:
             scale=300,
         )
 
-        # self.renderer = WireframeRenderer(self.camera)
-        self.renderer = WireframeRenderer(self.camera, color=7)
+        # self.renderer = WireframeRenderer(self.camera, color=7)
         # self.renderer = HiddenLineRenderer(
         #     self.camera,
         #     bg_color=0,
         #     light_dir=(1, -1, -1),
         #     shade_levels=5,
         #     base_color=7,
+        #     shade=True,
+        #     # wired=True
         # )
         # self.renderer = GouraudRenderer(self.camera, light_dir=(1,-1,-1))
         # self.renderer = ZBufferedGouraudRenderer(self.camera, light_dir=(1, -1, -1))
-        # self.renderer = PhongRenderer(
-        #     self.camera,
-        #     light_dir=(1, -1, -1),
-        #     ambient=0.2,
-        #     diffuse=0.8,
-        #     specular=0.4,
-        #     shininess=32,
-        #     shade_levels=16,   # Gouraudより滑らか
-        # )
+        self.renderer = PhongRenderer(
+            self.camera,
+            light_dir=(1, 1, -3),
+            # ambient=0.2,
+            # diffuse=0.8,
+            # specular=0.4,
+            # shininess=32,
+            ambient=0.25,
+            diffuse=0.75,
+            specular=0.6,
+            shininess=4,
+            # shade_levels=16,
+            shade_levels=32,
+            dithering=True,
+        )
 
         self.last_time = time.time()
         self.frame_counter = 0
@@ -229,6 +238,7 @@ class Wireframe:
         self.frame_compute_time = 0.0
 
         pyxel.init(512, 512, title="Wireframe", fps=FPS)
+        pyxel.load("my_resource.pyxres")
         pyxel.run(self.update, self.draw)
 
     def update(self):
@@ -250,7 +260,7 @@ class Wireframe:
     def draw(self):
         # Draw処理
         pyxel.cls(0)
-        # self.renderer.clear_zbuffer()
+        self.renderer.clear_zbuffer()  # ZBuffer Rendering 以外の場合はコメントアウトする
         self.renderer.draw_mesh(self.sphere)
 
         # 処理終了
